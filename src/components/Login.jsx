@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,6 +37,8 @@ export default function Login() {
                 setSuccess(response.data.message);
                 setEmail("");
                 setPassword("");
+                localStorage.setItem("token", response.data.token);
+                navigate("/dashboard");
             } else {
                 setError(response.data.message || "Login failed.");
             }
@@ -101,6 +105,13 @@ export default function Login() {
                         Submit
                     </button>
                 </form>
+
+                <p className="mt-4 text-center text-gray-600">
+                    Don’t have an account?{" "}
+                    <Link to="/" className="text-blue-600 hover:underline">
+                        Register here
+                    </Link>
+                </p>
             </div>
         </section>
     );

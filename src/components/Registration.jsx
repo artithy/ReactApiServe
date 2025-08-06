@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 export default function SignupForm() {
@@ -9,6 +9,8 @@ export default function SignupForm() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,12 +41,15 @@ export default function SignupForm() {
                 password,
             });
 
-            if (response.data.status) {
+            if (response.data.status && response.data.token) {
                 setSuccess(response.data.message);
                 setUserName("");
                 setEmail("");
                 setPassword("");
                 setConfirmPassword("");
+
+                localStorage.setItem("token", response.data.token);
+                navigate("/dashboard");
             } else {
                 setError(response.data.message || "Signup failed.");
             }
@@ -53,6 +58,7 @@ export default function SignupForm() {
             console.error(err);
         }
     };
+
 
     return (
         <section className="bg-gray-50 min-h-screen flex items-center justify-center px-6 py-8">
