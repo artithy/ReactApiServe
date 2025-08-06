@@ -1,5 +1,6 @@
 import { Link, Routes, Route, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import Cuisine from "./Cuisine";
 import axios from "axios";
 
 
@@ -58,21 +59,21 @@ export default function Dashboard() {
         transform transition-transform duration-300
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
             >
-                <div className="text-2xl font-bold text-purple-700 mb-6">Admin Panel</div>
+                <div className="text-2xl font-bold text-blue-700 mb-6">Admin Panel</div>
                 <nav className="space-y-3">
-                    <Link to="/dashboard" className="block hover:text-purple-600">
+                    <Link to="/dashboard" className="block hover:text-blue-600">
                         Dashboard Home
                     </Link>
-                    <Link to="/dashboard/add-food" className="block hover:text-purple-600">
+                    <Link to="/dashboard/add-food" className="block hover:text-blue-600">
                         Add Food
                     </Link>
-                    <Link to="/dashboard/all-foods" className="block hover:text-purple-600">
+                    <Link to="/dashboard/all-foods" className="block hover:text-blue-600">
                         All Foods
                     </Link>
-                    <Link to="/dashboard/add-cuisine" className="block hover:text-purple-600">
+                    <Link to="/dashboard/add-cuisine" className="block hover:text-blue-600">
                         Add Cuisine
                     </Link>
-                    <Link to="/dashboard/all-orders" className="block hover:text-purple-600">
+                    <Link to="/dashboard/all-orders" className="block hover:text-blue-600">
                         All Orders
                     </Link>
 
@@ -99,8 +100,9 @@ export default function Dashboard() {
                     <Routes>
                         <Route
                             index
-                            element={<h2>Welcome, {email}!</h2>}
-                        />
+                            element={<h2>Welcome, {email}!</h2>} />
+                        <Route path="add-cuisine" element={<Cuisine />} />
+
                     </Routes>
                 </main>
             </div>
