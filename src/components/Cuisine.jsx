@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Cuisine() {
     const [name, setName] = useState("");
@@ -13,17 +15,17 @@ export default function Cuisine() {
             if (res.data.status) {
                 setCuisines(res.data.data);
             } else {
-                alert("Failed to load cuisines");
+                toast.error("Failed to load cuisines");
             }
         } catch {
-            alert("Failed to load cuisines");
+            toast.error("Failed to load cuisines");
         }
     };
 
     const handleAddCuisine = async (e) => {
         e.preventDefault();
         if (!name) {
-            alert("Please enter cuisine name");
+            toast.warning("Please enter cuisine name");
             return;
         }
 
@@ -33,11 +35,11 @@ export default function Cuisine() {
                 { name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(res.data.message);
+            toast.success(res.data.message);
             setName("");
             fetchAllCuisines();
         } catch {
-            alert("Add failed");
+            toast.error("Add failed");
         }
     };
 
@@ -56,12 +58,12 @@ export default function Cuisine() {
                 { id, name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(res.data.message);
+            toast.success(res.data.message);
             setId(null);
             setName("");
             fetchAllCuisines();
         } catch {
-            alert("Update failed");
+            toast.error("Update failed");
         }
     };
 
@@ -72,13 +74,12 @@ export default function Cuisine() {
                 { id: id },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(res.data.message);
+            toast.success(res.data.message);
             fetchAllCuisines();
         } catch {
-            alert("Delete failed");
+            toast.error("Delete failed");
         }
     };
-
 
     useEffect(() => {
         fetchAllCuisines();
@@ -86,6 +87,19 @@ export default function Cuisine() {
 
     return (
         <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded shadow">
+            {/* Toast container positioned on top-right */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
+
             <h2 className="text-2xl font-bold mb-4 text-center text-blue-700">
                 {id ? "Update Cuisine" : "Add Cuisine"}
             </h2>
