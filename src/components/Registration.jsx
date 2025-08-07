@@ -1,36 +1,34 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function SignupForm() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-        setSuccess("");
 
         if (!userName || !email || !password || !confirmPassword) {
-            setError("Please fill all fields.");
+            toast.error("Please fill all fields.");
             return;
         }
         if (password.length < 6) {
-            setError("Password must be at least 6 characters long.");
+            toast.error("Password must be at least 6 characters long.");
             return;
         }
         if (password !== confirmPassword) {
-            setError("Passwords do not match.");
+            toast.error("Passwords do not match.");
             return;
         }
         if (!email.includes("@") || !email.includes(".")) {
-            setError("Please enter a valid email.");
+            toast.error("Please enter a valid email.");
             return;
         }
 
@@ -42,31 +40,29 @@ export default function SignupForm() {
             });
 
             if (response.data.status && response.data.token) {
-                setSuccess(response.data.message);
+                toast.success(response.data.message);
                 setUserName("");
                 setEmail("");
                 setPassword("");
                 setConfirmPassword("");
 
                 localStorage.setItem("token", response.data.token);
-                navigate("/dashboard");
+                setTimeout(() => {
+                    navigate("/dashboard");
+                }, 2000);
             } else {
-                setError(response.data.message || "Signup failed.");
+                toast.error(response.data.message || "Signup failed.");
             }
         } catch (err) {
-            setError("Signup failed. Please try again.");
+            toast.error("Signup failed. Please try again.");
             console.error(err);
         }
     };
-
 
     return (
         <section className="bg-gray-50 min-h-screen flex items-center justify-center px-6 py-8">
             <div className="w-full max-w-md bg-white rounded-lg shadow border p-6">
                 <h1 className="text-2xl font-bold mb-6 text-gray-900">Create an account</h1>
-
-                {error && <p className="text-red-600 mb-4">{error}</p>}
-                {success && <p className="text-green-600 mb-4">{success}</p>}
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
@@ -159,6 +155,8 @@ export default function SignupForm() {
                     </Link>
                 </p>
             </div>
+
+            <ToastContainer position="top-right" autoClose={3000} />
         </section>
     );
 }
