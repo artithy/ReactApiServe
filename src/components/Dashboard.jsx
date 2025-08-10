@@ -2,6 +2,7 @@ import { Link, Routes, Route, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Cuisine from "./Cuisine";
 import AddFood from "./AddFood";
+import FoodList from "./FoodList";
 import axios from "axios";
 
 
@@ -104,6 +105,7 @@ export default function Dashboard() {
                             element={<h2>Welcome, {email}!</h2>} />
                         <Route path="add-cuisine" element={<Cuisine />} />
                         <Route path="add-food" element={<AddFood />} />
+                        <Route path="all-foods" element={<FoodList />} />
 
                     </Routes>
                 </main>
