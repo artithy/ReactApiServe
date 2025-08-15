@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 
 export default function FoodMenu() {
     const [foods, setFoods] = useState([]);
     const [counts, setCounts] = useState([]);
     const [selectedCuisine, setSelectedCuisine] = useState("All");
+    const [cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
         const fetchFoods = async () => {
@@ -23,6 +27,31 @@ export default function FoodMenu() {
         fetchFoods();
     }, []);
 
+
+    useEffect(() => {
+        try {
+            const cartData = JSON.parse(localStorage.getItem("local_cart") || "{}");
+            const updatedCart = Object.entries(cartData)
+                .map(([id, qty]) => {
+                    const food = foods.find(food => food.id === +id);
+                    if (!food) {
+                        return null;
+                    }
+                    return {
+                        food_id: food.id,
+                        food_name: food.name,
+                        quantity: qty,
+                        price: food.discount_price,
+                        item_total: qty * food.discount_price,
+                        image: food.image
+                    };
+                })
+                .filter(Boolean);
+            setCartItems(updatedCart);
+        } catch (error) {
+            setCartItems([]);
+        }
+    }, [foods]);
 
     const cuisine = ["All"];
     foods.forEach(food => {
