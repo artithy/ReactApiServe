@@ -9,6 +9,8 @@ export default function FoodMenu() {
     const [counts, setCounts] = useState([]);
     const [selectedCuisine, setSelectedCuisine] = useState("All");
     const [cartItems, setCartItems] = useState([]);
+    const [cartToken, setCartToken] = useState("");
+
 
     useEffect(() => {
         const fetchFoods = async () => {
@@ -27,31 +29,43 @@ export default function FoodMenu() {
         fetchFoods();
     }, []);
 
+    useEffect(() => {
+        const initCart = async () => {
+            try {
+                const res = await axios.post("http://localhost:8000/create_guest_cart.php", {});
+
+                if (res.data.status) {
+                    setCartToken(res.data.cart_token);
+                }
+            } catch (error) {
+                console.error("Failed to create new cart:", error);
+            }
+        };
+        initCart();
+    }, []);
+
+
+
 
     useEffect(() => {
-        try {
-            const cartData = JSON.parse(localStorage.getItem("local_cart") || "{}");
-            const updatedCart = Object.entries(cartData)
-                .map(([id, qty]) => {
-                    const food = foods.find(food => food.id === +id);
-                    if (!food) {
-                        return null;
-                    }
-                    return {
-                        food_id: food.id,
-                        food_name: food.name,
-                        quantity: qty,
-                        price: food.discount_price,
-                        item_total: qty * food.discount_price,
-                        image: food.image
-                    };
-                })
-                .filter(Boolean);
-            setCartItems(updatedCart);
-        } catch (error) {
-            setCartItems([]);
-        }
-    }, [foods]);
+        if (!cartToken || foods.length === 0) return;
+
+        const fetchCartItems = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/get_cart_item_with_food.php?cart_token=${cartToken}`);
+                if (res.data.status) {
+                    setCartItems(res.data.item);
+                    const countsMap = {};
+                    res.data.item.forEach(item => countsMap[item.food_id] = item.quantity);
+                    setCounts(countsMap);
+                }
+            } catch (error) {
+                console.error("failed to create_cart:", error);
+            }
+        };
+
+        fetchCartItems();
+    }, [cartToken, foods]);
 
     const cuisine = ["All"];
     foods.forEach(food => {
@@ -66,25 +80,39 @@ export default function FoodMenu() {
         : foods.filter(food => (food.cuisine_name || "N/A") === selectedCuisine);
 
 
-    const increaseCount = (id) => {
-        setCounts((prev) => ({
-            ...prev,
-            [id]: (prev[id] || 0) + 1,
+    const increaseCount = async (foodId) => {
+        const newQty = (counts[foodId] || 0) + 1;
+        setCounts(prev => ({ ...prev, [foodId]: newQty }));
 
-        }));
+        try {
+            await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, {
+                cart_token: cartToken,
+                food_id: foodId,
+                quantity: newQty
+            });
+        } catch (error) {
+            console.error("Cart update failed:", error);
+        }
+    };
 
-    }
+    const decreaseCount = async (foodId) => {
+        const current = counts[foodId] || 0;
+        if (current <= 0) return;
 
-    const decreaseCount = (id) => {
-        setCounts((prev) => {
-            const current = prev[id] || 0;
-            if (current <= 0) return prev;
-            return {
-                ...prev,
-                [id]: current - 1,
-            }
-        })
-    }
+        const newQty = current - 1;
+        setCounts(prev => ({ ...prev, [foodId]: newQty }));
+
+        try {
+            await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, {
+                cart_token: cartToken,
+                food_id: foodId,
+                quantity: newQty
+            });
+        } catch (error) {
+            console.error("Cart update failed:", error);
+        }
+    };
+
 
     return (
         <div className="p-8 bg-blue-50 min-h-screen">
