@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Cart from "./Cart";
 import { useNavigate } from "react-router-dom";
 
 export default function FoodMenu() {
@@ -9,6 +10,7 @@ export default function FoodMenu() {
     const [cartItems, setCartItems] = useState([]);
     const [cartToken, setCartToken] = useState("");
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFoods = async () => {
