@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cart from "./Cart";
-import { useNavigate } from "react-router-dom";
+import Drawer from "./Drawer";
 
 export default function FoodMenu() {
     const [foods, setFoods] = useState([]);
@@ -10,7 +10,6 @@ export default function FoodMenu() {
     const [cartItems, setCartItems] = useState([]);
     const [cartToken, setCartToken] = useState("");
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFoods = async () => {
@@ -68,45 +67,35 @@ export default function FoodMenu() {
     const updateCartItems = async () => {
         try {
             const res = await axios.get(`http://localhost:8000/get_cart_item_with_food.php?cart_token=${cartToken}`);
-
             if (res.data.status) {
                 const uniqueItems = [];
                 const seenFoodIds = [];
-
                 res.data.item.forEach(item => {
                     if (!seenFoodIds.includes(item.food_id)) {
                         uniqueItems.push(item);
                         seenFoodIds.push(item.food_id);
                     }
                 });
-
                 setCartItems(uniqueItems);
 
                 const countsMap = {};
-                res.data.item.forEach(item => {
-                    countsMap[item.food_id] = item.quantity;
-                });
-
+                res.data.item.forEach(item => countsMap[item.food_id] = item.quantity);
                 setCounts(countsMap);
+
+                return uniqueItems;
             }
+            return [];
         } catch (error) {
             console.error("Failed to update cart:", error);
+            return [];
         }
     };
 
     const increaseCount = async (foodId) => {
         try {
-            const currentQty = counts[foodId] || 0;
-            const newQty = currentQty + 1;
-
-            await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, {
-                cart_token: cartToken,
-                food_id: foodId,
-                quantity: newQty
-            });
-
+            const newQty = (counts[foodId] || 0) + 1;
+            await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, { cart_token: cartToken, food_id: foodId, quantity: newQty });
             setCounts(prev => ({ ...prev, [foodId]: newQty }));
-
             await updateCartItems();
             setIsDrawerOpen(true);
         } catch (error) {
@@ -120,7 +109,6 @@ export default function FoodMenu() {
             if (currentQty <= 0) return;
 
             const newQty = currentQty - 1;
-
             await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, {
                 cart_token: cartToken,
                 food_id: foodId,
@@ -129,8 +117,12 @@ export default function FoodMenu() {
 
             setCounts(prev => ({ ...prev, [foodId]: newQty }));
 
-            await updateCartItems();
-            if (newQty === 0) setIsDrawerOpen(false);
+            const updatedItems = await updateCartItems();
+            const filteredItems = updatedItems.filter(item => counts[item.food_id] > 0);
+            setCartItems(filteredItems);
+
+            if (filteredItems.length === 0) setIsDrawerOpen(false);
+
         } catch (error) {
             console.error("Cart update failed:", error);
         }
@@ -147,42 +139,41 @@ export default function FoodMenu() {
     };
 
     return (
-        <div className="p-8 bg-blue-50 min-h-screen">
-            <h1 className="text-4xl font-extrabold text-center mb-12 text-blue-800 tracking-wide">
-                Explore Our Delicious Menu
-            </h1>
-
-            <div className="flex justify-center mb-6">
-                <button
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
-                >
-                    Cart: ${calculateCartTotal()}
-                </button>
-            </div>
-
-            <div className="flex justify-center space-x-2 mb-6 overflow-x-auto no-scrollbar">
-                {cuisine.map(c => (
+        <div className="bg-blue-50 min-h-screen relative flex">
+            <div className="flex-1 flex flex-col">
+                <header className="w-full p-4 flex justify-between items-center sticky top-0 bg-blue-50 z-30">
+                    <h1 className="text-3xl font-bold text-gray-800">Explore Our Food Menu</h1>
                     <button
-                        key={c}
-                        onClick={() => setSelectedCuisine(c)}
-                        className={`px-3 py-2 rounded-full font-semibold whitespace-nowrap text-sm transition ${selectedCuisine === c ? "bg-blue-700 text-white shadow-md" : "bg-white text-blue-700 border border-blue-700 hover:bg-blue-100"
-                            }`}
+                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full flex items-center shadow-md transition duration-200"
                     >
-                        {c}
+                        <span className="hidden sm:inline">{isDrawerOpen ? 'Hide Cart' : 'View Cart'}</span>
+                        <span className="ml-2 px-2 py-1 bg-white text-purple-800 rounded-full text-sm font-semibold">
+                            ${calculateCartTotal()}
+                        </span>
                     </button>
-                ))}
-            </div>
+                </header>
 
-            {filteredFoods.length === 0 ? (
-                <p className="text-center text-gray-600 text-lg">No food items available.</p>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {filteredFoods.map(food => (
-                        <div
-                            key={food.id}
-                            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden"
+                <div className="flex mt-2 justify-center space-x-2 mb-6 overflow-x-auto no-scrollbar sticky top-16 bg-blue-50 z-20">
+                    {cuisine.map(c => (
+                        <button
+                            key={c}
+                            onClick={() => setSelectedCuisine(c)}
+                            className={`px-3 py-2 rounded-full font-semibold whitespace-nowrap text-sm transition ${selectedCuisine === c ? "bg-blue-700 text-white shadow-md" : "bg-white text-blue-700 border border-blue-700 hover:bg-blue-100"
+                                }`}
                         >
+                            {c}
+                        </button>
+                    ))}
+                </div>
+
+                <div
+                    className={`transition-all duration-300 
+    ${isDrawerOpen ? "mr-[26rem] mb-10" : "mr-0 mb-0"} 
+    p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8`}
+                >
+                    {filteredFoods.map(food => (
+                        <div key={food.id} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden">
                             <img src={`http://localhost:8000/${food.image}`} alt={food.name} className="w-full h-48 object-cover rounded-t-2xl" />
                             <div className="p-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{food.name}</h2>
@@ -209,6 +200,26 @@ export default function FoodMenu() {
                             </div>
                         </div>
                     ))}
+                </div>
+
+            </div>
+
+            {isDrawerOpen && cartItems.length > 0 && (
+                <div className="fixed top-40 right-5  bottom-10 w-96 z-50 rounded-lg">
+                    <Drawer
+                        isOpen={isDrawerOpen}
+                        onClose={() => setIsDrawerOpen(false)}
+                        cartItemsCount={cartItems.length}
+                    >
+                        <Cart
+                            cartItems={cartItems}
+                            counts={counts}
+                            increaseCount={increaseCount}
+                            decreaseCount={decreaseCount}
+                            calculateCartTotal={calculateCartTotal}
+                            setIsDrawerOpen={setIsDrawerOpen}
+                        />
+                    </Drawer>
                 </div>
             )}
 
