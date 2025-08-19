@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart({
     cartItems,
@@ -6,9 +7,11 @@ export default function Cart({
     increaseCount,
     decreaseCount,
     calculateCartTotal,
-    navigate,
     setIsDrawerOpen,
+    cartToken,
 }) {
+
+    const navigate = useNavigate();
     if (!cartItems || cartItems.length === 0) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -67,13 +70,21 @@ export default function Cart({
                 </div>
                 <button
                     onClick={() => {
-                        navigate("/checkout");
+                        navigate("/order", {
+                            state: {
+                                cartItems,
+                                counts,
+                                totalPrice: calculateCartTotal(),
+                                cartToken,
+                            },
+                        });
                         setIsDrawerOpen(false);
                     }}
                     className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
                 >
                     Checkout
                 </button>
+
             </div>
         </div>
     );

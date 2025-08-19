@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import FoodMenu from './components/FoodMenu';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import OrderPage from './components/OrderPage';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -20,6 +21,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/menu" element={<FoodMenu />} />
+        <Route path="/order" element={<OrderPage />} />
 
       </Routes>
     </>

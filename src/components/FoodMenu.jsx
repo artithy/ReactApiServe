@@ -218,6 +218,7 @@ export default function FoodMenu() {
                             decreaseCount={decreaseCount}
                             calculateCartTotal={calculateCartTotal}
                             setIsDrawerOpen={setIsDrawerOpen}
+                            cartToken={cartToken}
                         />
                     </Drawer>
                 </div>
