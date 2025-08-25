@@ -109,24 +109,43 @@ export default function FoodMenu() {
             if (currentQty <= 0) return;
 
             const newQty = currentQty - 1;
-            await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, {
-                cart_token: cartToken,
-                food_id: foodId,
-                quantity: newQty
+
+            if (newQty > 0) {
+                await axios.post(
+                    "http://localhost:8000/add_to_cart.php",
+                    { cart_token: cartToken, food_id: foodId, quantity: newQty },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+            } else {
+                // Delete item
+                await axios.post(
+                    "http://localhost:8000/delete_cart.php",
+                    { cart_token: cartToken, food_id: foodId },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+            }
+
+            setCounts(prev => {
+                const updated = { ...prev };
+                if (newQty > 0) {
+                    updated[foodId] = newQty;
+                } else {
+                    delete updated[foodId];
+                }
+                return updated;
             });
 
-            setCounts(prev => ({ ...prev, [foodId]: newQty }));
-
             const updatedItems = await updateCartItems();
-            const filteredItems = updatedItems.filter(item => counts[item.food_id] > 0);
-            setCartItems(filteredItems);
+            setCartItems(updatedItems);
 
-            if (filteredItems.length === 0) setIsDrawerOpen(false);
-
+            if (updatedItems.length === 0) setIsDrawerOpen(false);
         } catch (error) {
             console.error("Cart update failed:", error);
         }
     };
+
+
+
 
     const calculateCartTotal = () => {
         let total = 0;
@@ -204,8 +223,8 @@ export default function FoodMenu() {
 
             </div>
 
-            {isDrawerOpen && cartItems.length > 0 && (
-                <div className="fixed top-40 right-5  bottom-10 w-96 z-50 rounded-lg">
+            {isDrawerOpen && cartItems.length > 0 ? (
+                <div className="fixed top-40 right-5 bottom-10 w-96 z-50 rounded-lg">
                     <Drawer
                         isOpen={isDrawerOpen}
                         onClose={() => setIsDrawerOpen(false)}
@@ -222,7 +241,8 @@ export default function FoodMenu() {
                         />
                     </Drawer>
                 </div>
-            )}
+            ) : null}
+
 
         </div>
     );

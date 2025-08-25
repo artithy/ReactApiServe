@@ -49,6 +49,7 @@ export default function OrderPage() {
 
         try {
             const res = await axios.post("http://localhost:8000/place_order.php", payload);
+            console.log(res.data);
             if (res.data.status) {
                 toast.success(`${res.data.message} (Order ID: ${res.data.order_id})`);
                 setCartItems([]);
@@ -56,7 +57,7 @@ export default function OrderPage() {
                 toast.error(res.data.message);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Axios error:", error);
             toast.error("Something went wrong");
         } finally {
             setPlacingOrder(false);
