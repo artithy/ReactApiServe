@@ -8,6 +8,7 @@ import FoodMenu from './components/FoodMenu';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import OrderPage from './components/OrderPage';
+import SuccessPage from './components/Success';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,6 +23,7 @@ function App() {
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/menu" element={<FoodMenu />} />
         <Route path="/order" element={<OrderPage />} />
+        <Route path="/success" element={<SuccessPage />} />
 
       </Routes>
     </>

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function OrderPage() {
     const location = useLocation();
+    const navigate = useNavigate();
     const {
         cartItems: initialCartItems = [],
         counts = {},
@@ -53,6 +54,7 @@ export default function OrderPage() {
             if (res.data.status) {
                 toast.success(`${res.data.message} (Order ID: ${res.data.order_id})`);
                 setCartItems([]);
+                navigate("/success", { state: { orderId: res.data.order_id } });
             } else {
                 toast.error(res.data.message);
             }
