@@ -36,6 +36,7 @@ export default function OrderPage() {
         const payload = {
             cart_token: cartToken,
             customer_name: order.customer_name,
+            email: order.email,
             delivery_address: order.delivery_address,
             phone_number: order.phone_number,
             order_notes: order.order_notes,
@@ -52,18 +53,21 @@ export default function OrderPage() {
             const res = await axios.post("http://localhost:8000/place_order.php", payload);
             console.log(res.data);
             if (res.data.status) {
-                toast.success(`${res.data.message} (Order ID: ${res.data.order_id})`);
-                setCartItems([]);
-                navigate("/success", { state: { orderId: res.data.order_id } });
+                window.location.href = res.data.payment_url;
             } else {
                 toast.error(res.data.message);
             }
         } catch (error) {
-            console.error("Axios error:", error);
-            toast.error("Something went wrong");
-        } finally {
-            setPlacingOrder(false);
+            if (error.response && error.response.data) {
+                console.error("PHP error:", error.response.data);
+                toast.error("Backend Error: " + error.response.data.message);
+            } else {
+                console.error("Axios error:", error);
+                toast.error("Something went wrong");
+            }
         }
+
+
     };
 
     if (!cartItems || cartItems.length === 0) {
@@ -103,6 +107,18 @@ export default function OrderPage() {
                         className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
+                <div className="mb-3">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Your Email"
+                        value={order.email || ""}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                </div>
+
 
                 <div className="mb-3">
                     <textarea
@@ -139,7 +155,7 @@ export default function OrderPage() {
                     />
                 </div>
 
-                <button type="submit" disabled={placingOrder} className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 font-medium transition duration-200">
+                <button type="submit" disabled={placingOrder} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 font-medium transition duration-200">
                     {placingOrder ? "Processing..." : `Pay $${total}`}
                 </button>
             </form>
