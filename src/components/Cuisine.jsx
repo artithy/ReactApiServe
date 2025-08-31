@@ -29,6 +29,20 @@ export default function Cuisine() {
             return;
         }
 
+
+        let exists = false;
+
+        for (let i = 0; i < cuisines.length; i++) {
+            if (cuisines[i].name.toLowerCase() === name.toLowerCase()) {
+                exists = true;
+                break;
+            }
+        }
+        if (exists) {
+            toast.warning("Cuisine already exists");
+            return;
+        }
+
         try {
             const res = await axios.post(
                 "http://localhost:8000/create_cuisine.php",
