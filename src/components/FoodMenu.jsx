@@ -93,11 +93,13 @@ export default function FoodMenu() {
 
     const increaseCount = async (foodId) => {
         try {
+            setIsDrawerOpen(true);
+
             const newQty = (counts[foodId] || 0) + 1;
             await axios.post(`http://localhost:8000/add_to_cart.php?cart_token=${cartToken}`, { cart_token: cartToken, food_id: foodId, quantity: newQty });
+
             setCounts(prev => ({ ...prev, [foodId]: newQty }));
             await updateCartItems();
-            setIsDrawerOpen(true);
         } catch (error) {
             console.error("Cart update failed:", error);
         }
@@ -197,9 +199,8 @@ export default function FoodMenu() {
                 </div>
 
                 <div
-                    className={`transition-all duration-300 
-    ${isDrawerOpen ? "mr-[26rem] mb-10" : "mr-0 mb-0"} 
-    p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8`}
+                    className={`transition-all duration-300 p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 ${isDrawerOpen ? 'bg-gray-200' : 'bg-blue-50'
+                        }`}
                 >
                     {filteredFoods.map(food => (
                         <div key={food.id} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden">
@@ -228,7 +229,6 @@ export default function FoodMenu() {
                                     </div>
                                 </div>
 
-
                                 <div className="flex items-center justify-center space-x-4 py-2">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); decreaseCount(food.id); }}
@@ -247,26 +247,26 @@ export default function FoodMenu() {
 
             </div>
 
-            {isDrawerOpen && cartItems.length > 0 ? (
-                <div className="fixed top-40 right-5 bottom-10 w-96 z-50 rounded-lg">
-                    <Drawer
-                        isOpen={isDrawerOpen}
-                        onClose={() => setIsDrawerOpen(false)}
-                        cartItemsCount={cartItems.length}
-                    >
-                        <Cart
-                            cartItems={cartItems}
-                            counts={counts}
-                            increaseCount={increaseCount}
-                            decreaseCount={decreaseCount}
-                            calculateCartTotal={calculateCartTotal}
-                            setIsDrawerOpen={setIsDrawerOpen}
-                            cartToken={cartToken}
-                            getFinalPrice={getFinalPrice}
-                        />
-                    </Drawer>
-                </div>
-            ) : null}
+            {isDrawerOpen && cartItems.length > 0 && (
+                <Drawer
+                    isOpen={isDrawerOpen}
+                    onClose={() => setIsDrawerOpen(false)}
+                    cartItemsCount={cartItems.length}
+                >
+                    <Cart
+                        cartItems={cartItems}
+                        counts={counts}
+                        increaseCount={increaseCount}
+                        decreaseCount={decreaseCount}
+                        calculateCartTotal={calculateCartTotal}
+                        setIsDrawerOpen={setIsDrawerOpen}
+                        cartToken={cartToken}
+                        getFinalPrice={getFinalPrice}
+                    />
+                </Drawer>
+
+            )}
+
 
 
         </div>

@@ -63,7 +63,7 @@ export default function Cart({
                 ))}
             </div>
 
-            <div className="p-4 border-t bg-white">
+            <div className="p-4 border-t bg-white sticky bottom-0">
                 <div className="font-bold text-lg mb-2">
                     Total: ${calculateCartTotal()}
                 </div>
