@@ -80,13 +80,13 @@ export default function OrderPage() {
 
             <div>
                 {cartItems.map(item => (
-                    <div key={item.food_id} className="flex items-center bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div key={item.food_id} className="flex items-center bg-white rounded-lg shadow-sm overflow-hidden mb-2">
                         <img src={`http://localhost:8000/${item.image}`} className="w-20 h-20 object-cover" />
                         <div className="flex-1 p-3">
                             <h3 className="text-md font-semibold text-gray-900">{item.name}</h3>
                             <p>Qty: {counts[item.food_id]}</p>
                         </div>
-                        <p>${(parseFloat(item.discount_price) * counts[item.food_id]).toFixed(2)}</p>
+                        <p className="pr-2">${(parseFloat(item.discount_price) * counts[item.food_id]).toFixed(2)}</p>
                     </div>
                 ))}
             </div>

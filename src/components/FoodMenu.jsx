@@ -26,19 +26,29 @@ export default function FoodMenu() {
     useEffect(() => {
         const initCart = async () => {
             try {
-                const res = await axios.post("http://localhost:8000/create_guest_cart.php", {});
-                if (res.data.status) setCartToken(res.data.cart_token);
+                const savedToken = localStorage.getItem("cartToken");
+
+                if (savedToken) {
+                    setCartToken(savedToken);
+                } else {
+                    const res = await axios.post("http://localhost:8000/create_guest_cart.php", {});
+                    if (res.data.status) {
+                        setCartToken(res.data.cart_token);
+                        localStorage.setItem("cartToken", res.data.cart_token);
+                    }
+                }
             } catch (err) {
-                console.error("Failed to create cart:", err);
+                console.error("Failed to initialize cart:", err);
             }
         };
+
         initCart();
     }, []);
 
-    useEffect(() => {
-        if (!cartToken || foods.length === 0) return;
 
-        const fetchCartItems = async () => {
+    useEffect(() => {
+        if (!cartToken) return;
+        const fetchCart = async () => {
             try {
                 const res = await axios.get(`http://localhost:8000/get_cart_item_with_food.php?cart_token=${cartToken}`);
                 if (res.data.status) {
@@ -47,12 +57,14 @@ export default function FoodMenu() {
                     res.data.item.forEach(item => countsMap[item.food_id] = item.quantity);
                     setCounts(countsMap);
                 }
-            } catch (err) {
-                console.error("Failed to fetch cart items:", err);
+            } catch (error) {
+                console.error("Failed to fetch cart:", error);
             }
         };
-        fetchCartItems();
-    }, [cartToken, foods]);
+
+        fetchCart();
+    }, [cartToken]);
+
 
     const cuisine = ["All"];
     foods.forEach(food => {
