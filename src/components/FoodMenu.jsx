@@ -197,7 +197,7 @@ export default function FoodMenu() {
                     </button>
                 </header>
 
-                <div className="flex mt-2 justify-center space-x-2 mb-6 overflow-x-auto no-scrollbar sticky top-16 bg-blue-50 z-20">
+                <div className="flex mt-2 justify-center space-x-2 mb-6 overflow-x-auto no-scrollbar sticky top-16 bg-blue-50 z-20 p-5 shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                     {cuisine.map(c => (
                         <button
                             key={c}
