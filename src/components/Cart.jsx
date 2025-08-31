@@ -9,6 +9,7 @@ export default function Cart({
     calculateCartTotal,
     setIsDrawerOpen,
     cartToken,
+    getFinalPrice,
 }) {
 
     const navigate = useNavigate();
@@ -35,13 +36,11 @@ export default function Cart({
                         <div className="flex-1">
                             <p className="font-semibold">{item.name}</p>
                             <p className="text-sm text-gray-600">
-                                ${parseFloat(item.discount_price).toFixed(2)} x{" "}
-                                {counts[item.food_id] || 0} = $
-                                {(
-                                    (parseFloat(item.discount_price) || 0) *
-                                    (counts[item.food_id] || 0)
-                                ).toFixed(2)}
+                                ${getFinalPrice(item.discount_price, item.vat_price).toFixed(2)} x {counts[item.food_id] || 0} = $
+                                {(getFinalPrice(item.discount_price, item.vat_price) * (counts[item.food_id] || 0)).toFixed(2)}
+
                             </p>
+
                         </div>
                         <div className="flex items-center space-x-2">
                             <button

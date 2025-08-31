@@ -150,12 +150,22 @@ export default function FoodMenu() {
     const calculateCartTotal = () => {
         let total = 0;
         cartItems.forEach(item => {
-            const price = parseFloat(item.discount_price) || 0;
+            const finalPrice = getFinalPrice(item.discount_price, item.vat_price);
             const qty = counts[item.food_id] || 0;
-            total += price * qty;
+            total += finalPrice * qty;
         });
         return total.toFixed(2);
     };
+
+
+
+
+    const getFinalPrice = (discountPrice, vatPercent) => {
+        const price = parseFloat(discountPrice) || 0;
+        const vat = parseFloat(vatPercent?.toString().replace("%", "")) || 0;
+        return price + (price * vat) / 100;
+    };
+
 
     return (
         <div className="bg-blue-50 min-h-screen relative flex">
@@ -193,18 +203,32 @@ export default function FoodMenu() {
                 >
                     {filteredFoods.map(food => (
                         <div key={food.id} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden">
-                            <img src={`http://localhost:8000/${food.image}`} alt={food.name} className="w-full h-48 object-cover rounded-t-2xl" />
+                            <div className="relative">
+                                <img src={`http://localhost:8000/${food.image}`} alt={food.name} className="w-full h-48 object-cover rounded-t-2xl" />
+                                <span className="absolute top-2 right-2 bg-blue-700 text-white text-xs font-bold px-2 py-1 rounded-lg shadow">
+                                    VAT: {parseInt(food.vat_price)}%
+                                </span>
+                            </div>
                             <div className="p-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{food.name}</h2>
                                 <p className="text-gray-700 text-sm mb-3 line-clamp-3">{food.description || "No description available."}</p>
                                 <p className="text-gray-800 text-sm mb-1"><span className="font-semibold">Cuisine:</span> {food.cuisine_name || "N/A"}</p>
                                 <p className="text-gray-800 text-sm mb-4"><span className="font-semibold">Stock:</span> {food.stock_quantity || 0}</p>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-green-700 font-bold text-lg">${food.discount_price}</span>
-                                    {parseFloat(food.discount_price) < parseFloat(food.price) && (
-                                        <span className="text-gray-400 line-through text-sm">${food.price}</span>
-                                    )}
+                                <div className="flex flex-col space-y-1 mb-2">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-green-700 font-bold text-lg">
+                                            ${getFinalPrice(food.discount_price, food.vat_price).toFixed(2)}
+                                        </span>
+
+                                        {parseFloat(food.discount_price) < parseFloat(food.price) && (
+                                            <span className="text-gray-400 line-through text-sm">
+                                                ${food.price}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
+
+
                                 <div className="flex items-center justify-center space-x-4 py-2">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); decreaseCount(food.id); }}
@@ -238,6 +262,7 @@ export default function FoodMenu() {
                             calculateCartTotal={calculateCartTotal}
                             setIsDrawerOpen={setIsDrawerOpen}
                             cartToken={cartToken}
+                            getFinalPrice={getFinalPrice}
                         />
                     </Drawer>
                 </div>
