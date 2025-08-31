@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Cuisine from "./Cuisine";
 import AddFood from "./AddFood";
 import FoodList from "./FoodList";
+import AllOrders from "./AllOrders";
 import axios from "axios";
 
 
@@ -106,6 +107,7 @@ export default function Dashboard() {
                         <Route path="add-cuisine" element={<Cuisine />} />
                         <Route path="add-food" element={<AddFood />} />
                         <Route path="all-foods" element={<FoodList />} />
+                        <Route path="all-orders" element={<AllOrders />} />
 
                     </Routes>
                 </main>
