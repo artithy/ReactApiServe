@@ -4,6 +4,7 @@ import Cuisine from "./Cuisine";
 import AddFood from "./AddFood";
 import FoodList from "./FoodList";
 import AllOrders from "./AllOrders";
+import DashboardHome from "./DashboardHome";
 import axios from "axios";
 
 
@@ -101,9 +102,7 @@ export default function Dashboard() {
                 </header>
                 <main className="p-6">
                     <Routes>
-                        <Route
-                            index
-                            element={<h2>Welcome, {email}!</h2>} />
+                        <Route index element={<DashboardHome />} />
                         <Route path="add-cuisine" element={<Cuisine />} />
                         <Route path="add-food" element={<AddFood />} />
                         <Route path="all-foods" element={<FoodList />} />

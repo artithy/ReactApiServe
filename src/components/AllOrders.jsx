@@ -52,10 +52,10 @@ export default function AllOrders() {
 
 
     return (
-        <div className="min-h-screen w-full bg-gray-100 px-5 py-20">
+        <div className="min-h-screen w-full">
             <h2 className="text-2xl font-bold mb-4">All orders</h2>
-            <div className="overflow-x-auto bg-gray-100 ">
-                <table className="min-w-full bg-white border border-gray-200 ">
+            <div className="overflow-x-auto ">
+                <table className="min-w-full bg-white border ">
                     <thead className="bg-gray-100">
                         <tr>
                             <th className="px-4 py-2 border">ID</th>
@@ -91,31 +91,32 @@ export default function AllOrders() {
                                 <td className="px-4 py-2 border">{parseFloat(order.total_price).toFixed(2)}</td>
                                 <td className="px-4 py-2 border">{new Date(order.order_date).toLocaleString()}</td>
                                 <td className="px-4 py-2 border">
-                                    <span className={
-                                        `
-                                        px-2 py-1 rounded-full text-xs font-semibold upppercase ${order.status === "pending" ? "bg-yellow-200 text-yellow-800"
-                                            : order.status === "processing" ? "bg-blue-200 text-blue-800"
-                                                : order.status === "delivered" ? "bg-green-200 text-green-800" : "bg-gray-200 text-gray-800"
-                                        }
-                                        `
-                                    }>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${order.status === "pending" ? "bg-yellow-200 text-yellow-800" :
+                                        order.status === "processing" ? "bg-blue-200 text-blue-800" :
+                                            order.status === "delivered" ? "bg-green-200 text-green-800" :
+                                                "bg-gray-200 text-gray-800"
+                                        }`}>
                                         {order.status}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-2 border">{order.status !== "delivered" && (
-                                    <button onClick={() => handleMarkAsDelivered(order.id)} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rouned text-sm"
-                                    >
-                                        Mark Delivered
-                                    </button>
-                                )}</td>
 
+
+                                    </span>
+
+                                </td>
+                                <td className="px-4 py-2 border">
+                                    {order.status !== "delivered" && (
+                                        <button
+                                            onClick={() => handleMarkAsDelivered(order.id)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                                        >
+                                            Mark Delivered
+                                        </button>
+                                    )}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-
             </div>
         </div>
+    );
 
-    )
 };
