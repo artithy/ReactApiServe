@@ -33,11 +33,14 @@ export default function SignupForm() {
         }
 
         try {
+            // Registration.jsx
             const response = await axios.post("http://localhost:8000/signup.php", {
                 user_name: userName,
                 email,
                 password,
             });
+
+
 
             if (response.data.status && response.data.token) {
                 toast.success(response.data.message);
